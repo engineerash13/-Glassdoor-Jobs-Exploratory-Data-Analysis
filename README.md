@@ -1,196 +1,129 @@
-# 💼 Glassdoor Jobs — Exploratory Data Analysis
+# Glassdoor Jobs EDA — Salary Trends & Workplace Analytics
 
-> **Decoding salary trends, workplace satisfaction, and hiring patterns across industries using 956 real job postings**
+An Exploratory Data Analysis of Glassdoor job postings (956 records) to uncover salary patterns, geographic job distribution, company rating dynamics, and in-demand technical skills. The project includes advanced feature engineering — salary parsing, skill extraction from job descriptions, company age calculation, and competitor analysis — to deliver actionable insights for job seekers, employers, and recruiters.
 
----
-
-## 📌 Project Overview
-
-In today's competitive talent market, understanding **what companies pay, how they're rated, and what skills they demand** is invaluable for job seekers, employers, and recruiters alike. This project performs a structured **Exploratory Data Analysis (EDA)** on Glassdoor job posting data to surface actionable insights around salary benchmarks, company ratings, sector demand, and the workplace factors that shape the modern employment landscape.
+**Author:** Ashwin Suryawanshi | **Type:** Individual Project
 
 ---
 
-## 🗂️ Dataset Description
+## Files in This Repository
 
-| Attribute | Details |
-|---|---|
-| **Dataset** | `glassdoor_jobs.csv` |
-| **Rows** | 956 |
-| **Columns** | 15 |
-| **Duplicates** | 0 |
-| **Missing Values** | None (post-cleaning) |
+| File | Description |
+|------|-------------|
+| `Glassdoor_EDA_By_Ashwin_Suryawanshi.ipynb` | Full EDA notebook — 9-step feature engineering, 20+ Seaborn/Plotly charts across UBM framework |
 
-### Key Columns
+---
+
+## Tools & Technologies
+
+- **Python** — Pandas, NumPy
+- **Visualization** — Matplotlib, Seaborn, Plotly Express
+- **Jupyter Notebook** — Google Colab
+
+---
+
+## Dataset
+
+**Source:** `glassdoor_jobs.csv`
+**Size:** 956 rows × 15 columns | 0 duplicates | 0 missing values
 
 | Column | Description |
-|---|---|
-| `Job Title` | Position title (e.g., Data Scientist, Software Engineer) |
-| `Company Name` | Hiring company |
-| `Salary Estimate` | Raw salary range string (e.g., `$80K–$120K`) |
-| `Rating` | Glassdoor company rating (1–5 scale) |
-| `Location` | City, State of the job |
-| `Headquarters` | Company HQ location |
-| `Company Size` | Employee count range |
-| `Company Type` | Public / Private / Government |
+|--------|-------------|
+| `Job Title` | Title of the job position |
+| `Company Name` | Name of the company (with embedded rating removed in wrangling) |
+| `Location` | City and state of the job |
+| `Headquarters` | Company's headquarter location |
+| `Salary Estimate` | Estimated salary range (e.g., "$80K-$120K") |
+| `Job Description` | Full text of job responsibilities and qualifications |
+| `Rating` | Company rating on Glassdoor (1.0–5.0 scale) |
+| `Company Size` | Employee headcount range (e.g., 51–200, 1000–5000) |
+| `Company Type` | Public, Private, Government, or Other |
 | `Industry` | Business sector (Tech, Finance, Healthcare, etc.) |
-| `Sector` | Broad classification (IT, Banking, Consulting, etc.) |
-| `Revenue` | Company revenue range |
-| `Founded` | Year of company founding |
-| `Competitor` | List of competing companies |
+| `Sector` | Broader sector classification |
+| `Revenue` | Company estimated revenue range |
+| `Founded` | Year company was founded |
+| `Competitors` | Comma-separated list of competing companies |
 
 ---
 
-## 🎯 Business Objective
+## Feature Engineering (9 steps)
 
-This analysis serves four key stakeholder groups:
-
-| Stakeholder | Value Delivered |
-|---|---|
-| **Job Seekers** | Understand salary expectations by role, location & company size |
-| **Employers** | Benchmark compensation packages to attract top talent |
-| **Recruiters** | Identify fair compensation practices across industries |
-| **Analysts** | Data-driven salary trend insights by industry & geography |
-
----
-
-## 🧹 Feature Engineering & Data Wrangling
-
-Raw Glassdoor salary data required significant transformation before analysis:
-
-```python
-# Salary parsing pipeline
-salary → strip Glassdoor estimate tags
-       → remove '$', 'K', 'per hour' labels
-       → extract min_salary and max_salary
-       → compute avg_salary = (min + max) / 2
-```
-
-### New Features Created
-
-| Feature | Description |
-|---|---|
-| `min_salary` | Lower bound of salary range |
-| `max_salary` | Upper bound of salary range |
-| `avg_salary` | Midpoint salary for analysis |
-| `job_state` | State extracted from Location |
-| `same_state` | Binary: Is job location == HQ? |
-| `job_simp` | Simplified job title |
-| `desc_len` | Length of job description |
-| Skill flags | Binary columns for Python, SQL, ML, etc. |
+| Feature | Logic | Insight |
+|---------|-------|---------|
+| `min_salary` | Parsed from Salary Estimate string — extracted lower bound | Enables numerical salary analysis |
+| `max_salary` | Parsed from Salary Estimate string — extracted upper bound | Enables salary range comparison |
+| `avg_salary` | `(min_salary + max_salary) / 2` | Primary salary metric for all comparisons |
+| `company_txt` | Stripped embedded rating from Company Name string | Clean grouping by company |
+| `job_state` | Extracted state abbreviation from Location | State-level job distribution analysis |
+| `same_state` | Binary — 1 if Location == Headquarters | Identifies remote vs HQ-based roles |
+| `age` | `2023 - Founded` (for valid years) | Company stability proxy |
+| `python_yn` / `R_yn` / `spark` / `aws` / `excel` | Binary flags — keyword presence in Job Description | In-demand skill frequency mapping |
+| `desc_len` | `len(Job Description)` | Proxy for role complexity |
+| `num_comp` | Count of comma-separated competitors | Market competition intensity |
 
 ---
 
-## 📊 Key Visualizations & Insights
+## Charts (20+ — UBM Framework)
 
-### ⭐ Company Ratings Distribution
-- Distribution is **slightly right-skewed** — most companies cluster between **3.0 and 4.0** on Glassdoor
-- The modal rating sits around **3.5**, suggesting most companies are perceived as "decent but not exceptional"
-- Very high ratings (4.5+) are rare, suggesting Glassdoor reviewers lean critical
+### Univariate Analysis
+| Chart | Type | Key Insight |
+|-------|------|-------------|
+| Distribution of Company Ratings | Histogram + KDE | Slightly right-skewed; most companies cluster between 3.0–4.0; peak at ~3.5 |
+| Number of Jobs by State | Countplot | California dominates significantly; MA, NY, VA are secondary hubs |
+| Salary Estimate Distribution | Histogram | Average salaries cluster in $80K–$120K range for data roles |
+| Company Size Distribution | Bar Chart | Mid-size companies (201–500, 1001–5000) post most data job listings |
+| Industry Distribution | Bar Chart | IT and Business Services sectors post the most roles |
 
-### 💰 Salary Analysis
+### Bivariate Analysis
+| Chart | Type | Key Insight |
+|-------|------|-------------|
+| Average Salary by State | Horizontal Box Plot | California and New York show highest median salaries with significant outliers |
+| Average Salary vs Company Rating | Scatter Plot | Weak positive correlation — higher salary does not guarantee higher rating |
+| Average Salary vs Job Description Length | Regression Plot | Weak positive correlation — longer descriptions suggest more complex, higher-paid roles |
+| Salary by Company Size | Box Plot | Larger companies (5000+ employees) offer wider salary ranges and higher ceilings |
+| Salary by Company Type | Box Plot | Public companies show higher median salaries than private firms |
+| Skills Frequency | Bar Chart | Python is most in-demand (highest frequency in JDs), followed by Excel and AWS |
 
-#### By Job Role
-- **Data Scientists and Machine Learning Engineers** command the highest average salaries
-- **DevOps and Software Engineers** follow, with significant variance driven by experience level and company size
-- Junior roles (OJT/Entry-level equivalent) show tighter salary bands
-
-#### By Location
-- **San Francisco** and **New York** show premium salary clusters well above national averages
-- **Austin** and **Seattle** represent competitive mid-tier markets gaining ground
-- Geographic salary disparity remains significant — same title, different state = potentially $20K–$40K difference
-
-#### By Company Size
-- Larger companies (5000+ employees) generally offer **higher base salaries**
-- Smaller firms show more **salary variability**, compensating with equity or culture premiums
-
-#### By Sector
-- **Finance, IT, and Consulting** sectors show the broadest salary spreads
-- Healthcare and Government sectors cluster at lower medians with less variability
-- **Violin plots** reveal that salary distributions are rarely symmetric — most are skewed or multimodal
-
-### 🏢 Industry & Sector Demand
-- **IT and Business Services** dominate job posting counts
-- Healthcare is a growing sector for analytical and data roles
-- Countplots show sharp demand concentration in a few sectors — **specialization pays**
-
-### 🔗 Correlation Analysis
-- **Weak correlations** between rating and salary — a highly-rated company doesn't necessarily pay more
-- Job description length shows **minimal salary predictive power**
-- `same_state` flag reveals companies hiring outside HQ tend to offer slightly higher packages
+### Multivariate Analysis
+| Chart | Type | Key Insight |
+|-------|------|-------------|
+| Correlation Heatmap (avg_salary, Rating, desc_len, num_comp) | Heatmap | All correlations are weak — no single feature strongly predicts salary |
+| Salary vs Rating by Industry | Scatter (colored by industry) | Finance and Tech industries cluster at higher salary + higher rating quadrant |
+| Salary vs Company Age | Scatter Plot | Newer companies show more salary variance; mature companies more stable pay bands |
+| State vs Skill Demand | Grouped Bar | California shows highest Python and AWS demand; NY leans toward Excel and R |
 
 ---
 
-## 🛠️ Tech Stack
+## Key Insights
 
-```python
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-import warnings
-```
-
-| Library | Purpose |
-|---|---|
-| Pandas & NumPy | Data transformation & feature engineering |
-| Matplotlib | Histograms, bar charts, box plots |
-| Seaborn | Violin plots, heatmaps, countplots, pair plots |
+- **California** has the most job postings — significantly more than any other state
+- **Python is the #1 in-demand skill** appearing most frequently in job descriptions, followed by Excel and AWS
+- **No strong correlation between salary and company rating** — compensation alone doesn't drive employee satisfaction
+- **Company size positively correlates with salary ceiling** — larger companies offer higher maximum pay
+- **Public companies pay more** than private firms across comparable roles
+- **Job description length weakly predicts salary** — more complex roles tend to have longer, more detailed descriptions
+- **Newer companies show more salary variance** — startups offer both very high and very low salaries relative to their size
 
 ---
 
-## 📁 Project Structure
+## Business Recommendations
 
-```
-Glassdoor-EDA/
-├── Glassdoor_EDA_By_Ashwin_Suryawanshi.ipynb
-├── glassdoor_jobs.csv
-└── README.md
-```
+**For Job Seekers:**
+- Target California, New York, and Massachusetts for the highest salary and job density
+- Prioritise Python and AWS skills — appear most frequently in job descriptions
+- Don't rely solely on salary when evaluating companies — rating correlates with culture, not just pay
 
----
+**For Employers:**
+- Benchmark salaries against California and NY rates to remain competitive for remote talent
+- Improve company rating through culture and growth opportunities, not just compensation
+- Use detailed job descriptions — they signal role complexity and attract qualified candidates
 
-## 🔍 Analysis Workflow
-
-```
-Raw Data → Feature Engineering (Salary Parsing, Skill Flags)
-    → Univariate Analysis (Ratings, Salary Distribution)
-    → Bivariate Analysis (Salary vs Role, Salary vs Location, Rating vs Sector)
-    → Multivariate Analysis (Sector + Size + Salary, Skill + Role + Pay)
-    → Business Recommendations → Conclusion
-```
+**For Recruiters:**
+- High competitor count in an industry signals competitive talent market — adjust salary offers accordingly
+- Mid-size companies (201–1000 employees) represent the highest volume of active hiring
 
 ---
 
-## 💡 Business Recommendations
+## Topics
 
-### For Employers
-- **Move beyond simplistic salary benchmarks** — description length and company rating are poor salary predictors; use role complexity and market surveys instead
-- **Offer total compensation packages** — benefits, equity, and WLB often outweigh base salary in candidate decision-making
-- **Maintain internal pay equity** — regular salary audits prevent quiet dissatisfaction and attrition
-
-### For Job Seekers
-- **Location is a lever** — targeting SF or NY for the same role can yield 20–30%+ higher compensation
-- **Sector matters more than company size** — Finance and IT outperform other sectors even at similar headcounts
-- **Skill stacking pays** — postings requiring Python + SQL + ML/DL tools consistently cluster at higher salary bands
-
-### Key KPIs to Monitor
-- Time-to-hire | Employee satisfaction scores | Turnover rate | Cost-per-hire | Quality-of-hire
-
----
-
-## 🏁 Conclusion
-
-This EDA project surfaces critical patterns in the modern hiring landscape. The findings demonstrate that salary is a complex function of **role, location, sector, and company scale** — and that simple correlations with rating or description length are misleading. By leveraging these data-driven insights, both job seekers and employers can make smarter, evidence-backed decisions in a competitive talent environment.
-
----
-
-## 👨‍💻 Author
-
-**Ashwin Suryawanshi**
-*EDA Capstone Project — Individual Contribution*
-
----
-
-## 📜 License
-
-This project is for educational and analytical purposes only.
+`eda` `python` `seaborn` `matplotlib` `glassdoor` `salary-analysis` `data-analysis` `pandas` `job-market` `feature-engineering`
